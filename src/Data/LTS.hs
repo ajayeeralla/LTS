@@ -14,88 +14,90 @@ This module implements a labelled transition system
 {-# LANGUAGE PartialTypeSignatures #-}
 
 module Data.LTS
-  (State (..),
-  Alphabet,
-  Transition (..),
-  LTS,
-  checkTrans,
-  getFromIds,
-  getToIds,
-  sortById,
-  sortByToSt,
-  sortByFromSt,
-  collectTrans,
-  getStartSt,
-  getFinalSt,
-  depth) where
-  import Data.Nat
-  import Data.List (sortBy)
-  import Data.Ord (comparing)
+  (LTSState (..)
+  , Alphabet
+  , Transition (..)
+  , LTS
+  , checkTrans
+  , getFromIds
+  , getToIds
+  , sortById
+  , sortByToSt
+  , sortByFromSt
+  , collectTrans
+  , getStartSt
+  , getFinalSt
+  , depth) where
+import Data.Nat
+import Data.List (sortBy)
+import Data.Ord (comparing)
 
-  -- | State is a record type which may hold id, output, etc.
-  data State a = State {id::Int, output::a} deriving (Read, Show, Eq)
+-- | LTSState is a record type which may hold id, output, etc.
+data LTSState a = LTSState {stateId::Int, output::a} deriving (Read, Show, Eq)
 
-  -- | Define Ord instance by id
-  instance (Eq a)=> Ord (State a) where
-    compare = comparing Data.LTS.id
+-- | Define Ord instance by id
+instance (Eq a)=> Ord (LTSState a) where
+  compare = comparing stateId
 
-  -- | Alphabet can be a list of any type
-  type Alphabet a = [a]
+-- | Alphabet can be a list of any type
+type Alphabet a = [a]
 
-  -- | Transition models that on a state, given input takes a step to the next state
-  data Transition a b = Transition {from::State a
-                            , guard::b
-                            , to::State a}
-                            deriving (Read, Show, Eq)
+-- | Transition models that on a LTSState, given input takes a step to the next LTSState
+data Transition a b = Transition {transitionFrom::LTSState a
+                          , transitionGuard::b
+                          , transitionTo::LTSState a}
+                          deriving (Read, Show, Eq)
 
-  -- | Define Ord instance
-  instance (Eq a, Eq b) => Ord (Transition a b) where
-    compare = comparing from
+-- | Define Ord instance
+instance (Eq a, Eq b) => Ord (Transition a b) where
+  compare = comparing transitionFrom
 
-  -- | LTS is nothing but list of transitions
-  type LTS a b = [Transition a b]
+-- | LTS is nothing but list of transitions
+type LTS a b = [Transition a b]
 
-  -- | Check if the set of transitions has same origin
-  checkTrans :: (Eq a, Eq b) => State a -> LTS a b -> Bool
-  checkTrans State {Data.LTS.id=x, output=s} (t:ts) = x==Data.LTS.id (from t) && checkTrans State {Data.LTS.id=x, output=s}  ts
+-- | Check if the set of transitions has same origin
+checkTrans :: (Eq a, Eq b) => LTSState a -> LTS a b -> Bool
+checkTrans st (t:ts) =
+  stateId st == stateId (transitionFrom t) && checkTrans st  ts
 
-  -- | Get origin state ids
-  getFromIds:: (Eq a, Eq b) =>  LTS a b -> [Int]
-  getFromIds  = map (Data.LTS.id . from)
+-- | Get origin LTSState ids
+getFromIds:: (Eq a, Eq b) =>  LTS a b -> [Int]
+getFromIds = map (stateId . transitionFrom)
 
-  -- | Get final state ids
-  getToIds :: (Eq a, Eq b) => LTS a b -> [Int]
-  getToIds = map (Data.LTS.id . to)
+-- | Get final LTSState ids
+getToIds :: (Eq a, Eq b) => LTS a b -> [Int]
+getToIds = map (stateId . transitionTo)
 
-  -- | Sort states by Id
-  sortById :: (Eq a) => [State a] -> [State a]
-  sortById = sortBy (comparing Data.LTS.id)
+-- | Sort LTSStates by Id
+sortById :: (Eq a) => [LTSState a] -> [LTSState a]
+sortById = sortBy (comparing stateId)
 
-  -- | Sort transitions by from state
-  sortByFromSt :: (Eq a, Eq b) => LTS a b -> LTS a b
-  sortByFromSt = sortBy (comparing from)
+-- | Sort transitions by from LTSState
+sortByFromSt :: (Eq a, Eq b) => LTS a b -> LTS a b
+sortByFromSt = sortBy (comparing transitionFrom)
 
-  -- | Sort transitions by to State
-  sortByToSt :: (Eq a, Eq b) => LTS a b -> LTS a b
-  sortByToSt = sortBy (comparing to)
+-- | Sort transitions by to LTSState
+sortByToSt :: (Eq a, Eq b) => LTS a b -> LTS a b
+sortByToSt = sortBy (comparing transitionTo)
 
-  -- | Compute set of transitions from a given state
-  collectTrans:: (Eq a, Eq b) => State a  -> LTS a b -> LTS a b
-  collectTrans State {Data.LTS.id=x, output=s} (t:ts) = if x == Data.LTS.id (from t)
-                        then t:collectTrans State {Data.LTS.id=x, output=s}  ts
-                        else collectTrans State {Data.LTS.id=x, output=s} ts
+-- | Compute set of transitions from a given LTSState
+collectTrans:: (Eq a, Eq b) => LTSState a  -> LTS a b -> LTS a b
+collectTrans st (t:ts) =
+  if stateId st == stateId (transitionFrom t)
+    then t:collectTrans st ts
+    else collectTrans st ts
 
-  -- | Get start state
-  getStartSt :: (Eq a, Eq b) => LTS a b -> State a
-  getStartSt ts =  from (head (sortByToSt (sortByFromSt ts)))
+-- | Get start LTSState
+getStartSt :: (Eq a, Eq b) => LTS a b -> LTSState a
+getStartSt ts =  transitionFrom (head (sortByToSt (sortByFromSt ts)))
 
-  -- | Get Final state
-  getFinalSt :: (Eq a, Eq b) => LTS a b -> State a
-  getFinalSt ts =  to (head (sortByToSt (sortByFromSt ts)))
+-- | Get Final LTSState
+getFinalSt :: (Eq a, Eq b) => LTS a b -> LTSState a
+getFinalSt ts =  transitionTo (head (sortByToSt (sortByFromSt ts)))
 
-  -- | Compute depth of a transition system which is nothing but a longest simple path from the start to a final state
-  depth :: (Eq a, Eq b) => LTS a b -> State a -> Nat
-  depth [] _ = 0
-  depth (t:ts) st
-    | from t == st && (from t /= to t) = 1 + depth ts (to t)
-    | otherwise = depth ts st
+-- | Compute depth of a transition system which is nothing but a longest simple path from the start to a final LTSState
+depth :: (Eq a, Eq b) => LTS a b -> LTSState a -> Nat
+depth [] _ = 0
+depth (t:ts) st
+  | transitionFrom t == st && (transitionFrom t /= transitionTo t) = 1 + depth ts (transitionTo t)
+  | otherwise = depth ts st

@@ -1,4 +1,4 @@
 module Main where
-import qualified Data.LTS as L
+--import qualified Data.LTS as L
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
