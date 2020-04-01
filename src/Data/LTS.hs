@@ -27,7 +27,8 @@ module Data.LTS
   , collectTrans
   , getStartSt
   , getFinalSt
-  , depth) where
+  , depth
+  , deterministicLTS) where
 import Data.Nat
 import Data.List (sortBy)
 import Data.Ord (comparing)
@@ -80,12 +81,18 @@ sortByFromSt = sortBy (comparing transitionFrom)
 sortByToSt :: (Eq a, Eq b) => LTS a b -> LTS a b
 sortByToSt = sortBy (comparing transitionTo)
 
+-- | Set the following for deterministic behaviour of a LTS
+deterministicLTS::Bool
+deterministicLTS= True
+
 -- | Compute set of transitions from a given LTSState
 collectTrans:: (Eq a, Eq b) => LTSState a  -> LTS a b -> LTS a b
 collectTrans st (t:ts) =
-  if stateId st == stateId (transitionFrom t)
-    then t:collectTrans st ts
-    else collectTrans st ts
+  let op = if stateId st == stateId (transitionFrom t)
+              then t:collectTrans st ts
+              else collectTrans st ts in
+              if deterministicLTS then sortByToSt op else op
+
 
 -- | Get start LTSState
 getStartSt :: (Eq a, Eq b) => LTS a b -> LTSState a
