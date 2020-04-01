@@ -13,7 +13,21 @@ This module implements a labelled transition system
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 
-module Data.LTS where
+module Data.LTS
+  (State (..),
+  Alphabet,
+  Transition (..),
+  LTS,
+  checkTrans,
+  getFromIds,
+  getToIds,
+  sortById,
+  sortByToSt,
+  sortByFromSt,
+  collectTrans,
+  getStartSt,
+  getFinalSt,
+  depth) where
   import Data.Nat
   import Data.List (sortBy)
   import Data.Ord (comparing)
