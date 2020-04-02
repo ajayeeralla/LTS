@@ -34,7 +34,11 @@ import Data.List (sortBy)
 import Data.Ord (comparing)
 
 -- | LTSState is a record type which may hold id, output, etc.
-data LTSState a = LTSState {stateId::Int, output::a} deriving (Read, Show, Eq)
+data LTSState a =
+  LTSState {stateId::Int
+           , output::a
+           }
+           deriving (Read, Show, Eq)
 
 -- | Define Ord instance by id
 instance (Eq a)=> Ord (LTSState a) where
@@ -44,10 +48,12 @@ instance (Eq a)=> Ord (LTSState a) where
 type Alphabet a = [a]
 
 -- | Transition models that on a LTSState, given input takes a step to the next LTSState
-data Transition a b = Transition {transitionFrom::LTSState a
-                          , transitionGuard::b
-                          , transitionTo::LTSState a}
-                          deriving (Read, Show, Eq)
+data Transition a b =
+  Transition { transitionFrom::LTSState a
+             , transitionGuard::b
+             , transitionTo::LTSState a
+             }
+             deriving (Read, Show, Eq)
 
 -- | Define Ord instance
 instance (Eq a, Eq b) => Ord (Transition a b) where
