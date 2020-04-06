@@ -10,9 +10,6 @@ Portability :  portable
 This module implements a labelled transition system
 -}
 
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE PartialTypeSignatures #-}
-
 module Data.LTS
   (LTSState (..)
   , Transition (..)
@@ -43,10 +40,7 @@ data LTSState a =
 instance (Eq a)=> Ord (LTSState a) where
   compare = comparing stateId
 
--- | Alphabet can be a list of any type
-type Alphabet a = [a]
-
--- | Transition models that on a LTSState, given input symbol from alphabet takes a step to the next LTSState
+-- | Transition models that on a LTSState, given input symbol from an alphabet [b], takes to the next LTSState
 data Transition a b =
   Transition { transitionFrom::LTSState a
              , transitionGuard::b

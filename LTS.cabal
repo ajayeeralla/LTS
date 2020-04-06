@@ -25,7 +25,16 @@ library
   exposed-modules:
     Data.LTS
 
-  build-depends:      base >=4.12.0.0 && <5,
-                      fin (== 0.1.1)
+  build-depends:      base >=4.12.0.0 && <5
+                      , fin >= 0.1.1 && < 0.2
 
-  
+
+test-suite tests
+  default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     tests
+  main-is:            Main.hs
+  build-depends:      LTS
+                    , QuickCheck ==2.14
+                    , base == 4.12.*
+  ghc-options:        -O2 -fno-warn-unused-do-bind
