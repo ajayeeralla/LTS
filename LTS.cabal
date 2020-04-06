@@ -38,3 +38,14 @@ test-suite tests
                     , QuickCheck ==2.14
                     , base == 4.12.*
   ghc-options:        -O2 -fno-warn-unused-do-bind
+
+benchmark bench
+  default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     bench
+  main-is:            Main.hs
+  build-depends:      LTS
+                    , base
+                    , time
+
+  ghc-options:        -O2

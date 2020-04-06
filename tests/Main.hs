@@ -5,7 +5,6 @@ module Main
   (prop_sortById
   , main) where
 import Test.QuickCheck
-import Data.List
 import Data.LTS
 
 
