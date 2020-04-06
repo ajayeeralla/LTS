@@ -15,7 +15,6 @@ This module implements a labelled transition system
 
 module Data.LTS
   (LTSState (..)
-  , Alphabet
   , Transition (..)
   , LTS
   , checkTrans
@@ -47,7 +46,7 @@ instance (Eq a)=> Ord (LTSState a) where
 -- | Alphabet can be a list of any type
 type Alphabet a = [a]
 
--- | Transition models that on a LTSState, given input takes a step to the next LTSState
+-- | Transition models that on a LTSState, given input symbol from alphabet takes a step to the next LTSState
 data Transition a b =
   Transition { transitionFrom::LTSState a
              , transitionGuard::b
@@ -94,7 +93,7 @@ collectTrans st (t:ts) b =
               then t:collectTrans st ts b
               else collectTrans st ts b in
               if b then sortByToSt op else op
-              
+
 -- | Get start LTSState
 getStartSt :: (Eq a, Eq b) => LTS a b -> LTSState a
 getStartSt ts =  transitionFrom (head (sortByToSt (sortByFromSt ts)))
