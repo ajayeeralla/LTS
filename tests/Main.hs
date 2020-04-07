@@ -20,7 +20,7 @@ tests :: TestTree
 tests = testGroup "Tests" [properties, unitTests]
 
 properties :: TestTree
-properties = testGroup "Properties" [scProps, qcProps]
+properties = testGroup "Properties" [scProps]
 
 instance Serial m a => Serial m (LTSState a)
 instance (Serial m a, Serial m b) => Serial m (Transition a b)
@@ -28,20 +28,10 @@ instance (Serial m a, Serial m b) => Serial m (Transition a b)
 scProps = testGroup "(checked by SmallCheck)"
     [ SC.testProperty "sortById == sortById . sortById" $
       \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)
-    , SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
-      \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
-    , SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
-      \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
-    ]
-
-
-qcProps = testGroup "(checked by QuickCheck)"
-    [ SC.testProperty "sortById == sortById . sortById" $
-        \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)
-    , SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
-        \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
-    , SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
-        \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
+    --, SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
+    -- \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
+    --, SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
+    --  \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
     ]
 
 s0 :: LTSState Int = LTSState {stateId=0, out=3}
