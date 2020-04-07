@@ -9,9 +9,10 @@ Portability :  portable
 
 This module implements a labelled transition system
 -}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Data.LTS
-  (LTSState (..)
+  ( LTSState (..)
   , Transition (..)
   , LTS
   , checkTrans
@@ -24,17 +25,21 @@ module Data.LTS
   , getStartSt
   , getFinalSt
   , depth
-  ) where
+  , Alphabet
+  , findTransIndex
+  )
+where
 import Data.Nat
+import GHC.Generics
 import Data.List (sortBy)
 import Data.Ord (comparing)
 
 -- | LTSState is a record type which may hold id, output, etc.
 data LTSState a =
   LTSState {stateId::Int
-           , output::a
+           , out::a
            }
-           deriving (Read, Show, Eq)
+           deriving (Read, Show, Eq, Generic)
 
 -- | Define Ord instance by id
 instance (Eq a)=> Ord (LTSState a) where
@@ -46,20 +51,46 @@ data Transition a b =
              , transitionGuard::b
              , transitionTo::LTSState a
              }
-             deriving (Read, Show, Eq)
+             deriving (Read, Show, Eq, Generic)
 
 -- | Define Ord instance
 instance (Eq a, Eq b) => Ord (Transition a b) where
   compare = comparing transitionFrom
 
+-- | Alphabet: a generic list
+type Alphabet b = [b]
+
 -- | LTS is nothing but list of transitions
 type LTS a b = [Transition a b]
+
+-- | Check if transition exists from a given symbol and state
+transExists :: (Eq a, Eq b) => LTSState a -> b -> LTS a b -> Bool
+transExists st x (t:ts) =
+  (transitionFrom t == st && transitionGuard t == x) || transExists st x ts
+
+-- | take next step from start state
+findTransIndex :: (Eq a, Eq b) => LTSState a -> b -> LTS a b -> Int
+findTransIndex st x (t:ts) =
+  if transExists st x (t:ts) then
+  (if transitionFrom t == st && transitionGuard t == x
+    then 0
+    else 1+ findTransIndex st x ts)
+    else -1
+-- | single transition
+nextStateSymbol :: (Eq a, Eq b) => LTSState a -> b -> LTS a b -> LTSState a
+nextStateSymbol s x ts =
+  if transExists s x ts then transitionTo (ts !! findTransIndex s x ts)
+    else s
+-- | LTS execution on a given state and Alphabet
+nextStateAlphabet :: (Eq a, Eq b) => LTSState a -> Alphabet b -> LTS a b -> LTSState a
+nextStateAlphabet s (x:xs) ts =
+  nextStateAlphabet (nextStateSymbol s x ts) xs ts
 
 -- | Check if the set of transitions has same origin
 checkTrans :: (Eq a, Eq b) => LTSState a -> LTS a b -> Bool
 checkTrans st (t:ts) =
   stateId st == stateId (transitionFrom t) && checkTrans st  ts
-
+-- | Sorting related functions
 -- | Get origin LTSState ids
 getFromIds:: (Eq a, Eq b) =>  LTS a b -> [Int]
 getFromIds = map (stateId . transitionFrom)
