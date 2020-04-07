@@ -29,7 +29,7 @@ library
   exposed-modules:
     Data.LTS
 
-  build-depends:      base >=4.12.0.0 && <5
+  build-depends:      base >= 4.8.2.0 && <5
                       , fin >= 0.1.1 && < 0.2
 
 
