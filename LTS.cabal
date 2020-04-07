@@ -56,5 +56,6 @@ benchmark lts-bench
   build-depends:      LTS
                     , base
                     , time
+                    , criterion
 
   ghc-options:        -O2

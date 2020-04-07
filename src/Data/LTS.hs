@@ -27,6 +27,7 @@ module Data.LTS
   , depth
   , Alphabet
   , findTransIndex
+  , transExists
   )
 where
 import Data.Nat

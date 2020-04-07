@@ -9,8 +9,6 @@ import Test.Tasty
 import Test.Tasty.SmallCheck as SC
 import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
-import Data.List
-import Data.Ord
 import Data.LTS
 import GHC.Generics
 import Test.SmallCheck.Series
@@ -25,14 +23,26 @@ properties :: TestTree
 properties = testGroup "Properties" [scProps, qcProps]
 
 instance Serial m a => Serial m (LTSState a)
+instance (Serial m a, Serial m b) => Serial m (Transition a b)
 
 scProps = testGroup "(checked by SmallCheck)"
-  [ SC.testProperty "sortById == sortById . sortById" $
-      \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)]
+    [ SC.testProperty "sortById == sortById . sortById" $
+      \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)
+    , SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
+      \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
+    , SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
+      \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
+    ]
+
 
 qcProps = testGroup "(checked by QuickCheck)"
-  [ SC.testProperty "sortById == sortById . sortById" $
-    \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)]
+    [ SC.testProperty "sortById == sortById . sortById" $
+        \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)
+    , SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
+        \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
+    , SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
+        \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
+    ]
 
 s0 :: LTSState Int = LTSState {stateId=0, out=3}
 s1 :: LTSState Int = LTSState {stateId=1, out=5}
