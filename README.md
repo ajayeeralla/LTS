@@ -20,10 +20,4 @@ main = do
     output <- depth [t1, t2]
     putStrLn ("depth of LTS [t1, t2]:"++output)
 ```
-## Dependencies
-`Data.LTS` module depends on the package `fin` to have natutal numbers support.
-## Usage
-The module can be imported by simply adding the following line:
-~~~ haskell
-import Data.LTS
-~~~
+
