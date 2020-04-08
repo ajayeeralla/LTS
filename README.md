@@ -3,6 +3,23 @@
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ajayeeralla/LTS/edit/master/LICENSE)
 
 This is a library that implements a [labelled transition system](https://en.wikipedia.org/wiki/Transition_system) that can be either deterministic or non-deterministic.
+
+## Example
+
+Here is an example to use LTS library:
+
+```
+import Data.LTS
+
+main = do
+    s0 :: LTSState Int = LTSState {stateId=0, out=3}
+    s1 :: LTSState Int = LTSState {stateId=1, out=5}
+    s2 :: LTSState Int = LTSState {stateId=2, out=7}
+    t1 :: Transition Int Char = Transition {transitionFrom=s0, transitionGuard='a', transitionTo=s1}
+    t2 :: Transition Int Char = Transition {transitionFrom=s1, transitionGuard='b', transitionTo=s2}
+    output <- depth [t1, t2]
+    putStrLn ("depth of LTS [t1, t2]:"++output)
+```
 ## Dependencies
 `Data.LTS` module depends on the package `fin` to have natutal numbers support.
 ## Usage
