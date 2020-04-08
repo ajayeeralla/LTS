@@ -7,7 +7,6 @@ module Main
 where
 import Test.Tasty
 import Test.Tasty.SmallCheck as SC
-import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
 import Data.LTS
 import GHC.Generics
@@ -28,10 +27,6 @@ instance (Serial m a, Serial m b) => Serial m (Transition a b)
 scProps = testGroup "(checked by SmallCheck)"
     [ SC.testProperty "sortById == sortById . sortById" $
       \xs -> sortById (xs :: [LTSState Int]) == sortById (sortById xs)
-    --, SC.testProperty "sortByFromSt == sortByFromSt . sortByFromSt" $
-    -- \xs -> sortByFromSt (xs :: LTS Int Bool) == sortByFromSt (sortByFromSt xs)
-    --, SC.testProperty "sortByToSt == sortByToSt . sortByToSt" $
-    --  \xs -> sortByToSt (xs :: LTS Int Bool) == sortByToSt (sortByToSt xs)
     ]
 
 s0 :: LTSState Int = LTSState {stateId=0, out=3}
